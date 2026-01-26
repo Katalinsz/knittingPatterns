@@ -10,6 +10,7 @@ import ClothingPreview from './components/ClothingPreview/ClothingPreview';
 import Controls from './components/Controls/Controls';
 import InfoSection from './components/InfoSection/InfoSection';
 import InfoModal from './components/Modal/InfoModal';
+import DocumentIcon from './assets/Logos/DocumentIcon.svg?react';
 
 function App() {
   const [knittingTensionMin, setKnittingTensionMin] = useState(19)
@@ -70,28 +71,14 @@ function App() {
         </div>
       </main>
 
-      {/* Info Button */}
-      <button className="info-scroll-button" onClick={scrollToInfo} title={isInInfoSection ? "Back to top" : "View detailed information"}>
-        <div className="info-icon-circle">
-          <img
-            src={isInInfoSection ? "/IconsImages/EditIcon.png" : "/IconsImages/InformationIcon.png"}
-            alt={isInInfoSection ? "Edit" : "Info"}
-            className="info-icon-img"
-          />
-        </div>
-        <svg className="arrow-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          {isInInfoSection ? (
-            <>
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
-            </>
-          ) : (
-            <>
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
-            </>
-          )}
-        </svg>
+      {/* Preview Instructions Button */}
+      <button
+        className={`info-scroll-button ${isInInfoSection ? 'active' : ''}`}
+        onClick={scrollToInfo}
+        title={isInInfoSection ? "Back to top" : "View detailed information"}
+      >
+        <span>{isInInfoSection ? "Close instructions" : "Preview instructions"}</span>
+        <DocumentIcon className="info-doc-icon" />
       </button>
 
       {/* Detailed Information Section */}

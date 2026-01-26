@@ -55,43 +55,50 @@ h3 {
 .info-scroll-button {
     position: fixed;
     bottom: 2rem;
-    right: 2rem;
+    right: 3rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    background: transparent;
-    border: none;
+    gap: 0.8rem;
+    background: var(--color-secondary);
+    /* Very light pink/off-white */
+    border: 2px solid var(--color-accent);
+    border-radius: 14px;
     cursor: pointer;
-    padding: 0;
-    transition: transform 0.3s ease;
+    padding: 0.5rem 1.4rem;
+    transition: all 0.3s ease;
     z-index: 100;
+    color: var(--color-accent);
+    font-weight: 600;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 12px rgba(255, 128, 138, 0.15);
+    /* Soft shadow matching accent */
 }
 
 .info-scroll-button:hover {
-    transform: translateY(5px);
-}
-
-.info-icon-circle {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(255, 128, 138, 0.25);
     background: white;
-    border: 2px solid rgba(128, 128, 128, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 
-.info-icon-img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
+.info-scroll-button.active {
+    background: var(--color-accent);
+    color: white;
 }
 
-.arrow-icon {
-    stroke: #333;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+.info-doc-icon {
+    width: 30px;
+    height: 30px;
+    /* Determine if fill or stroke is needed based on the SVG, usually currentcolor works */
+    color: currentColor;
+}
+
+.info-doc-icon path,
+.info-doc-icon rect,
+.info-doc-icon circle {
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 0.5px;
+    /* Adjust if needed */
 }
 
 /* Responsive Design */
