@@ -1,0 +1,74 @@
+.header {
+    height: 80px;
+    border: 3px solid rgba(255, 128, 139, 0.322);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2.5rem;
+    background: #F5F5F0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    font-weight: 500;
+    font-size: 1.8rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.header-nav {
+    display: flex;
+    gap: 7rem;
+    align-items: center;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #064B3A;
+    /* Default text color */
+}
+
+.nav-item:hover {
+    color: #FF808A;
+    transition: color 0.2s ease;
+}
+
+.nav-icon {
+    width: 48px;
+    height: 48px;
+    /* Remove object-fit as it applies to img */
+    color: inherit;
+    /* Inherit color from parent or set explicitly */
+}
+
+/* Allow coloring the internal paths */
+.nav-icon path,
+.nav-icon rect,
+.nav-icon circle,
+.nav-icon polygon {
+    fill: currentColor;
+    /* Or stroke: currentColor depending on the icon */
+}
+
+.nav-item:first-child .nav-icon {
+    width: 46px;
+    height: 46px;
+}
+
+.account-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 60%;
+    /* No object-fit for SVG component */
+    margin-top: 0.6rem;
+    color: inherit;
+}

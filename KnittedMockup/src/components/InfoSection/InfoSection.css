@@ -1,0 +1,313 @@
+.info-section {
+    padding: 4rem 3rem;
+    width: 100%;
+    background: white;
+}
+
+.instructions-header {
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+}
+
+.instructions-header h2 {
+    font-size: 4.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #000;
+    line-height: 1.1;
+    letter-spacing: normal;
+}
+
+.instructions-subtitle {
+    font-size: 1.7rem;
+    color: #000000;
+    margin: 0;
+    font-weight: 200;
+    letter-spacing: normal;
+    max-width: 700px;
+    line-height: 1.5;
+}
+
+.instructions-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+}
+
+.accordion-item {
+    margin-bottom: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+.accordion-item:last-child {
+    margin-bottom: 2rem;
+}
+
+.accordion-header {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    background: white;
+    border: 1px solid rgba(162, 162, 162, 0.233);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.accordion-header:hover {
+    border-color: rgba(128, 128, 128, 0.4);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.accordion-header span {
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: #444;
+    letter-spacing: normal;
+}
+
+.accordion-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+}
+
+.accordion-icon {
+    width: 20px;
+    height: 20px;
+    stroke: #666;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.accordion-item.active .accordion-header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.accordion-content.open {
+    max-height: 1000px;
+    padding: 2rem 1.5rem;
+    background: white;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    color: #0066cc;
+    letter-spacing: 0.02em;
+}
+
+.measurements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.measurement-labels,
+.measurement-values {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 3rem;
+    padding: 0.5rem 2rem;
+}
+
+.measurement-labels span {
+    flex: 1;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #333;
+    min-width: 120px;
+}
+
+.measurement-values span {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+    min-width: 120px;
+}
+
+.accordion-content-inner {
+    padding: 1rem 2rem 3rem 2rem;
+    background: white;
+}
+
+.accordion-content h3 {
+    font-size: 3.4rem;
+    font-weight: 700;
+    margin: 0 0 0.2rem 0;
+    color: #000;
+    line-height: 1.1;
+    letter-spacing: normal;
+}
+
+.accordion-content p {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    color: #666;
+    font-weight: 200;
+    max-width: 800px;
+}
+
+.accordion-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.accordion-content li {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 0.5rem 0;
+    color: #444;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.accordion-content li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #000;
+    font-weight: bold;
+}
+
+.knitting-chart-section {
+    margin-top: 4rem;
+}
+
+.knitting-chart-section h3 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 2rem 0;
+    color: #000;
+    letter-spacing: 0.03em;
+}
+
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.chart-image {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.chart-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.total-rows {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    background: white;
+    border-radius: 40px;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.row-navigator {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nav-button {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
+.nav-button:hover:not(:disabled) {
+    opacity: 0.7;
+}
+
+.nav-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.current-row-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.row-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #000;
+}
+
+.row-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000;
+    background: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
