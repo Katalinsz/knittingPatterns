@@ -12,15 +12,21 @@
     justify-content: space-between;
     gap: 1.5rem;
     position: relative;
+    border-bottom: 2px solid var(--color-primary);
+    /* The green line under header */
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.1rem;
 }
 
 .control-header label {
-    font-size: 1.65rem;
-    font-weight: 500;
-    color: #000;
+    font-size: 2.65rem;
+    font-weight: 400;
+    color: var(--color-text);
     white-space: nowrap;
     position: relative;
     padding-right: 2.5rem;
+    flex-shrink: 0;
+    /* Prevent label from shrinking/moving */
 }
 
 .info-button {
@@ -31,13 +37,13 @@
     border: none;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1.1rem;
-    color: #666;
+    font-size: 1.5rem;
+    color: var(--color-accent);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    text-shadow: 0 0 8px rgba(102, 102, 102, 0.6);
+    text-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.211);
     animation: text-glow 2s infinite;
     padding: 0;
     width: auto;
@@ -46,35 +52,44 @@
 
 @keyframes text-glow {
     0% {
-        text-shadow: 0 0 8px rgba(102, 102, 102, 0.6);
+        text-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.211);
     }
 
     50% {
-        text-shadow: 0 0 16px rgba(102, 102, 102, 0.8);
+        text-shadow: 0 0 16px rgba(var(--color-accent-rgb), 0.211);
     }
 
     100% {
-        text-shadow: 0 0 8px rgba(102, 102, 102, 0.6);
+        text-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.211);
     }
 }
 
 .info-button:hover {
-    color: #333;
-    text-shadow: 0 0 20px rgba(102, 102, 102, 1);
+    color: var(--color-accent);
+    text-shadow: 0 0 20px rgba(var(--color-accent-rgb), 0.211);
     transform: scale(1.1);
 }
 
 .value-display {
-    padding: 0.65rem 1.75rem;
+    padding: 0.7rem 0;
+    /* Remove horizontal padding, rely on width */
+    /* Slightly reduced padding to match screenshot better */
     border: none;
-    border-radius: 25px;
-    font-size: 1.05rem;
+    border-radius: 60px;
+    color: #FFFFFF;
+    font-size: 1.4rem;
     font-weight: 500;
     text-align: center;
-    width: fit-content;
-    min-width: 130px;
-    background: white;
+    width: 155px;
+    /* Fixed width to prevent jitter */
+    min-width: 100px;
+    background: var(--color-primary);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+    filter: drop-shadow(0 2px 4px rgba(var(--color-primary-rgb), 0.6));
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Prevent value from shrinking */
+    font-variant-numeric: tabular-nums;
 }
 
 .slider {
@@ -83,24 +98,85 @@
     width: 100%;
     height: 8px;
     border-radius: 4px;
-    background: #ccc;
+    background: transparent;
+    /* Changed from var(--color-secondary) to generic transparent */
     outline: none;
-    margin: 0.5rem 0;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+    /* On top of visuals */
 }
 
-.dual-slider-container {
+.dual-slider-container,
+.single-slider-container {
     position: relative;
     width: 100%;
     height: 50px;
     display: flex;
     align-items: center;
+    /* Padding for the thumb overhang? Adjust if needed */
+}
+
+/* Custom Track Visuals */
+.slider-track-visuals {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 29px;
+    /* Key alignment: roughly half slider thumb width if default */
+    box-sizing: border-box;
+    z-index: 1;
+    /* Behind slider */
+    pointer-events: none;
+}
+
+/* The horizontal line line */
+.slider-track-visuals::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    margin-top: -0.8rem;
+    right: 12px;
+    height: 6px;
+    background: #f4f4f0;
+    /* Off-white / light beige track color */
+    border-radius: 3px;
+    z-index: -1;
+}
+
+.slider-dot {
+    width: 8px;
+    height: 8px;
+    background: #e0e0e0;
+    margin-top: 2rem;
+    gap: 1rem;
+    /* Gray dot color */
+    border-radius: 50%;
 }
 
 .dual-slider-container .slider {
     position: absolute;
     width: 100%;
-    margin: 0;
+    left: 0;
     pointer-events: none;
+    /* Let clicks pass unless handles */
+    padding: 0 12px;
+    /* Match visuals padding for alignment */
+    box-sizing: border-box;
+}
+
+.single-slider-container .slider {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+    /* Do NOT set pointer-events: none here, or single slider won't work */
 }
 
 .dual-slider-container .slider::-webkit-slider-thumb {
@@ -112,54 +188,60 @@
 }
 
 .slider-min {
-    z-index: 1;
+    z-index: 4;
+    /* Higher than max to ensure min handle is clickable if overlapping? */
 }
 
 .slider-max {
-    z-index: 2;
-    background: transparent;
+    z-index: 3;
 }
 
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 50px;
-    height: 36px;
-    border-radius: 18px;
-    background: white;
+    width: 44px;
+    /* Slightly adjusted */
+    height: 32px;
+    border-radius: 16px;
+    background: var(--color-accent);
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 8px rgba(255, 125, 125, 0.25), 0 1px 3px rgba(255, 125, 125, 0.15);
+    margin-top: -12px;
+    /* Center thumb vertically relative to track if needed, though appearance none usually handles it */
+    transform: translateY(0);
+    /* Reset defaults */
+}
+
+/* Fix for Firefox alignment if needed */
+.slider::-moz-range-thumb {
+    width: 44px;
+    height: 32px;
+    border-radius: 16px;
+    background: var(--color-accent);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(255, 125, 125, 0.25), 0 1px 3px rgba(255, 125, 125, 0.15);
 }
 
 .slider::-webkit-slider-thumb:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(255, 125, 125, 0.3), 0 2px 4px rgba(255, 125, 125, 0.2);
 }
 
 .slider::-webkit-slider-thumb:active {
     transform: scale(1.02);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-.slider::-moz-range-thumb {
-    width: 50px;
-    height: 36px;
-    border-radius: 18px;
-    background: white;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 6px rgba(255, 125, 125, 0.3);
 }
 
 .slider::-moz-range-thumb:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(255, 125, 125, 0.3), 0 2px 4px rgba(255, 125, 125, 0.2);
 }
 
 .slider::-moz-range-thumb:active {
     transform: scale(1.02);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 6px rgba(255, 125, 125, 0.3);
 }

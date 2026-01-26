@@ -46,7 +46,7 @@ h3 {
     flex: 0 1 500px;
     display: flex;
     flex-direction: column;
-    gap: 11rem;
+    gap: 4rem;
     padding-top: 4rem;
     margin-right: 3rem;
 }

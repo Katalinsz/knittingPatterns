@@ -38,10 +38,16 @@ const Controls: React.FC<ControlsProps> = ({
                     <div className="value-display">{tensionMin} × {tensionMax}</div>
                 </div>
                 <div className="dual-slider-container">
+                    <div className="slider-track-visuals">
+                        {tensionValues.map((_, i) => (
+                            <div key={i} className="slider-dot" style={{ opacity: i < 1 || i > 5 ? 0 : 1 }} />
+                        ))}
+                    </div>
                     <input
                         type="range"
                         min="0"
                         max="6"
+                        step="1"
                         value={tensionValues.indexOf(tensionMin)}
                         onChange={(e) => {
                             const newMin = tensionValues[parseInt(e.target.value)];
@@ -55,6 +61,7 @@ const Controls: React.FC<ControlsProps> = ({
                         type="range"
                         min="0"
                         max="6"
+                        step="1"
                         value={tensionValues.indexOf(tensionMax)}
                         onChange={(e) => {
                             const newMax = tensionValues[parseInt(e.target.value)];
@@ -79,14 +86,22 @@ const Controls: React.FC<ControlsProps> = ({
                     </label>
                     <div className="value-display">{sizes[chestSize]}</div>
                 </div>
-                <input
-                    type="range"
-                    min="0"
-                    max="5"
-                    value={chestSize}
-                    onChange={(e) => setChestSize(parseInt(e.target.value))}
-                    className="slider"
-                />
+                <div className="single-slider-container">
+                    <div className="slider-track-visuals">
+                        {sizes.map((_, i) => (
+                            <div key={i} className="slider-dot" style={{ opacity: i < 1  ? 0 : 1 }} />
+                        ))}
+                    </div>
+                    <input
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        value={chestSize}
+                        onChange={(e) => setChestSize(parseInt(e.target.value))}
+                        className="slider"
+                    />
+                </div>
             </div>
         </>
     );

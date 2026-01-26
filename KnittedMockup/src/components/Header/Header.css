@@ -1,18 +1,19 @@
 .header {
     height: 80px;
-    border: 3px solid rgba(255, 128, 139, 0.322);
+    border: 3px solid rgba(var(--color-accent-rgb), 0.322);
+    border-radius: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 2.5rem;
-    background: #F5F5F0;
+    background: var(--color-secondary);
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 1000;
-    font-weight: 500;
-    font-size: 1.8rem;
+    font-weight: 550;
+    font-size: 2.2rem;
 }
 
 .logo-container {
@@ -21,9 +22,15 @@
     cursor: pointer;
 }
 
+.logo-container img {
+    height: 70px;
+    /* Adjust this value to change logo size */
+    width: auto;
+}
+
 .header-nav {
     display: flex;
-    gap: 7rem;
+    gap: 6.6rem;
     align-items: center;
 }
 
@@ -33,21 +40,26 @@
     gap: 0.8rem;
     cursor: pointer;
     white-space: nowrap;
-    color: #064B3A;
+    color: var(--color-text);
     /* Default text color */
+    transition: all 0.2s ease;
 }
 
 .nav-item:hover {
-    color: #FF808A;
-    transition: color 0.2s ease;
+    color: var(--color-accent);
+    filter: drop-shadow(0 2px 4px rgba(var(--color-accent-rgb), 0.211));
 }
 
 .nav-icon {
     width: 48px;
     height: 48px;
-    /* Remove object-fit as it applies to img */
-    color: inherit;
-    /* Inherit color from parent or set explicitly */
+    color: var(--color-primary);
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover .nav-icon {
+    color: var(--color-accent);
+    filter: drop-shadow(0 2px 4px rgba(var(--color-accent-rgb), 0.211));
 }
 
 /* Allow coloring the internal paths */
@@ -56,19 +68,34 @@
 .nav-icon circle,
 .nav-icon polygon {
     fill: currentColor;
-    /* Or stroke: currentColor depending on the icon */
 }
 
 .nav-item:first-child .nav-icon {
     width: 46px;
     height: 46px;
 }
+.nav-item:nth-child(2) .nav-icon {
+    width: 56px;
+    height: 56px;
+}
 
 .account-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 60%;
-    /* No object-fit for SVG component */
-    margin-top: 0.6rem;
-    color: inherit;
+    width: 50px;
+    height: 50px;
+    margin-top: 0.75rem;
+    color: var(--color-primary);
+    transition: all 0.2s ease;
+}
+
+/* Allow coloring the internal paths for account icon */
+.account-icon path,
+.account-icon rect,
+.account-icon circle,
+.account-icon polygon {
+    fill: currentColor;
+}
+
+.account-icon:hover {
+    color: var(--color-accent);
+    filter: drop-shadow(0 2px 4px rgba(var(--color-accent-rgb), 0.211));
 }

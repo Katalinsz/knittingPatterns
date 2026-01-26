@@ -2,6 +2,15 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+
+  /* Global Color Palette */
+  --color-accent: #FF808A;
+  --color-accent-rgb: 255, 128, 138;
+  --color-text: #064B3A;
+  --color-primary: #137663;
+  --color-primary-rgb: 19, 118, 99;
+  --color-secondary: #F5F5F0;
+
   color: #213547;
   background-color: #ffffff;
   font-synthesis: none;

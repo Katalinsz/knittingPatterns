@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './ClothingPreview.css';
+import SweaterIcon from '../../assets/Logos/SweaterIcon.svg?react';
+import ImageIcon from '../../assets/Logos/ImageIcon.svg?react';
 
 const ClothingPreview = () => {
     const [isClothingDropdownOpen, setIsClothingDropdownOpen] = useState(false);
@@ -13,12 +15,12 @@ const ClothingPreview = () => {
                 >
                     Clothing
                     <svg
-                        width="16"
-                        height="16"
+                        width="30"
+                        height="30"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="3"
                         className={isClothingDropdownOpen ? 'rotated' : ''}
                     >
                         <polyline points="6 9 12 15 18 9" />
@@ -29,7 +31,7 @@ const ClothingPreview = () => {
                     <div className="dropdown-menu">
                         <button className="dropdown-item">
                             <div className="dropdown-item-content">
-                                <img src="/IconsImages/WhoolHatIcon.png" alt="Hats" />
+                                <SweaterIcon />
                                 <span>Hats</span>
                             </div>
                             <span className="dropdown-item-arrow">›</span>
@@ -68,12 +70,12 @@ const ClothingPreview = () => {
 
             <div className={`sweater-preview ${isClothingDropdownOpen ? 'dropdown-open' : ''}`}>
                 <div className="sweater-container">
-                    <img src="/IconsImages/SweaterPreviewIcon.png" alt="Sweater Preview" className="sweater-base" />
-                    <img src="/IconsImages/ImageIcon.png" alt="Motif" className="motif-overlay" />
+                    <SweaterIcon className="sweater-base" />
+                    <ImageIcon className="motif-overlay" />
                 </div>
                 <div className="motif-size">
                     <label>Motif size</label>
-                    <div className="size-display">46.2 × 54.6</div>
+                    <div className="size-display">46 × 54</div>
                 </div>
             </div>
         </>
