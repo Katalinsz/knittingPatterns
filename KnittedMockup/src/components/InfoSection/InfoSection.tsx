@@ -1,8 +1,11 @@
 import { useState, forwardRef } from 'react';
 import './InfoSection.css';
+import DownloadIcon from '../../assets/Logos/DownloadIcon.svg?react';
+import EditIcon from '../../assets/Logos/EditIcon.svg?react';
+import ArrowUpIcon from '../../assets/Logos/ArrowUpIcon.svg?react';
+import InfoIcon from '../../assets/Logos/InfoIcon.svg?react';
 
 // Data definition outside component to keep it clean
-// In a real app, this might come from props or a separate data file
 const ACCORDION_DATA = [
     {
         id: 0,
@@ -116,7 +119,7 @@ const ACCORDION_DATA = [
     }
 ];
 
-const InfoSection = forwardRef<HTMLDivElement>((_, ref) => {
+const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>(({ showFloatingButtons }, ref) => {
     const [openAccordions, setOpenAccordions] = useState<Set<number>>(new Set());
     const [currentRow, setCurrentRow] = useState(14);
     const [totalRows] = useState(48);
@@ -168,11 +171,36 @@ const InfoSection = forwardRef<HTMLDivElement>((_, ref) => {
         }
     ];
 
+    const toggleAll = () => {
+        if (openAccordions.size === accordionData.length) {
+            setOpenAccordions(new Set());
+        } else {
+            const allIds = new Set(accordionData.map(section => section.id));
+            setOpenAccordions(allIds);
+        }
+    };
+
+    // Check if all are currently open to set button text
+    const isAllOpen = openAccordions.size === accordionData.length;
+
     return (
         <section ref={ref} className="info-section">
             <div className="instructions-header">
-                <h2>Knitting pattern</h2>
-                <p className="instructions-subtitle">Precise instructions about how to knit your motifs</p>
+                <div className="header-content">
+                    <div>
+                        <h2>Knitting pattern</h2>
+                        <p className="instructions-subtitle">Precise instructions about how to knit your motifs</p>
+                    </div>
+                    <button
+                        className={`expand-all-button ${isAllOpen ? 'active' : ''}`}
+                        onClick={toggleAll}
+                        aria-label={isAllOpen ? 'Collapse All' : 'Expand All'}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div className="instructions-container">
@@ -197,6 +225,26 @@ const InfoSection = forwardRef<HTMLDivElement>((_, ref) => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            <div className={`floating-actions ${showFloatingButtons ? 'visible' : ''}`}>
+                <div className="action-button-wrapper download-wrapper">
+                    <div className="download-tooltip">
+                        <div className="tooltip-header">
+                            <strong>Download pdf pattern</strong>
+                            <InfoIcon className="info-icon" />
+                        </div>
+                        <p>Pro tip: The PDF is locked to the specific settings provided. Stick to the interactive guide above if you want instructions that adapt as you work.</p>
+                    </div>
+                    <button className="action-button download-button">
+                        <DownloadIcon />
+                    </button>
+                </div>
+                <button className="action-button combined-button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                    <EditIcon />
+                    <div className="vertical-divider"></div>
+                    <ArrowUpIcon />
+                </button>
             </div>
         </section>
     );

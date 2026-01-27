@@ -59,9 +59,6 @@ h3 {
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    background: var(--color-secondary);
-    /* Very light pink/off-white */
-    border: 2px solid var(--color-accent);
     border-radius: 14px;
     cursor: pointer;
     padding: 0.5rem 1.4rem;
@@ -70,19 +67,23 @@ h3 {
     color: var(--color-accent);
     font-weight: 600;
     font-size: 1.4rem;
-    box-shadow: 0 4px 12px rgba(255, 128, 138, 0.15);
+    backdrop-filter: blur(10px);
+    background: rgba(var(--color-secondary-rgb), 0.5);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.233);
+    box-shadow: 0 8px 24px rgba(var(--color-accent-rgb), 0.35);
+
     /* Soft shadow matching accent */
 }
 
 .info-scroll-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(255, 128, 138, 0.25);
-    background: white;
+    box-shadow: 0 8px 24px rgba(var(--color-accent-rgb), 0.55);
+    border-color: rgba(var(--color-accent-rgb), 0.4);
 }
 
 .info-scroll-button.active {
-    background: var(--color-accent);
-    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
 }
 
 .info-doc-icon {

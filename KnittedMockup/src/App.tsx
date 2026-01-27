@@ -77,13 +77,13 @@ function App() {
         onClick={scrollToInfo}
         title={isInInfoSection ? "Back to top" : "View detailed information"}
       >
-        <span>{isInInfoSection ? "Close instructions" : "Preview instructions"}</span>
+        <span>Preview instructions</span>
         <DocumentIcon className="info-doc-icon" />
       </button>
 
       {/* Detailed Information Section */}
       {showInfoSection && (
-        <InfoSection ref={infoSectionRef} />
+        <InfoSection ref={infoSectionRef} showFloatingButtons={isInInfoSection} />
       )}
 
       {/* Info Modals */}
