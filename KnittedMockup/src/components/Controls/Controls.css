@@ -93,18 +93,10 @@
 }
 
 .slider {
-    -webkit-appearance: none;
     appearance: none;
-    width: 100%;
-    height: 8px;
-    border-radius: 4px;
     background: transparent;
-    /* Changed from var(--color-secondary) to generic transparent */
     outline: none;
-    margin: 0;
-    position: relative;
     z-index: 2;
-    /* On top of visuals */
 }
 
 .dual-slider-container,
@@ -114,7 +106,6 @@
     height: 50px;
     display: flex;
     align-items: center;
-    /* Padding for the thumb overhang? Adjust if needed */
 }
 
 /* Custom Track Visuals */
@@ -143,10 +134,19 @@
     margin-top: -0.8rem;
     right: 12px;
     height: 6px;
-    background: #f4f4f0;
-    /* Off-white / light beige track color */
+    background: var(--color-secondary);
     border-radius: 3px;
     z-index: -1;
+}
+
+.slider-track-fill {
+    position: absolute;
+    top: 27%;
+    height: 6px;
+    background: var(--color-primary);
+    border-radius: 3px;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .slider-dot {
@@ -155,8 +155,14 @@
     background: #e0e0e0;
     margin-top: 2rem;
     gap: 1rem;
-    /* Gray dot color */
     border-radius: 50%;
+    transition: background-color 0.2s ease;
+    z-index: 1;
+    /* Ensure dots are above the fill line */
+}
+
+.slider-dot.active {
+    background: var(--color-primary);
 }
 
 .dual-slider-container .slider {
@@ -164,9 +170,7 @@
     width: 100%;
     left: 0;
     pointer-events: none;
-    /* Let clicks pass unless handles */
     padding: 0 12px;
-    /* Match visuals padding for alignment */
     box-sizing: border-box;
 }
 
@@ -176,7 +180,6 @@
     left: 0;
     padding: 0 12px;
     box-sizing: border-box;
-    /* Do NOT set pointer-events: none here, or single slider won't work */
 }
 
 .dual-slider-container .slider::-webkit-slider-thumb {
@@ -200,27 +203,23 @@
     -webkit-appearance: none;
     appearance: none;
     width: 44px;
-    /* Slightly adjusted */
     height: 32px;
     border-radius: 16px;
     background: var(--color-accent);
-    border: none;
+    /*border: 2px solid var(--color-text);*/
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 3px 8px rgba(255, 125, 125, 0.25), 0 1px 3px rgba(255, 125, 125, 0.15);
     margin-top: -12px;
-    /* Center thumb vertically relative to track if needed, though appearance none usually handles it */
     transform: translateY(0);
-    /* Reset defaults */
 }
 
-/* Fix for Firefox alignment if needed */
 .slider::-moz-range-thumb {
     width: 44px;
     height: 32px;
     border-radius: 16px;
     background: var(--color-accent);
-    border: none;
+    border: 2px solid var(--color-primary);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 3px 8px rgba(255, 125, 125, 0.25), 0 1px 3px rgba(255, 125, 125, 0.15);

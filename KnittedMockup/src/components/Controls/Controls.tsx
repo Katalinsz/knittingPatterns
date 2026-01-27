@@ -39,9 +39,26 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
                 <div className="dual-slider-container">
                     <div className="slider-track-visuals">
-                        {tensionValues.map((_, i) => (
-                            <div key={i} className="slider-dot" style={{ opacity: i < 1 || i > 5 ? 0 : 1 }} />
-                        ))}
+                        {/* The filled line between min and max */}
+                        <div
+                            className="slider-track-fill"
+                            style={{
+                                left: `calc(29px + (100% - 58px) * (${tensionValues.indexOf(tensionMin)} / 6))`,
+                                width: `calc((100% - 58px) * ((${tensionValues.indexOf(tensionMax)} - ${tensionValues.indexOf(tensionMin)}) / 6))`
+                            }}
+                        />
+                        {tensionValues.map((_, i) => {
+                            const currentMinIndex = tensionValues.indexOf(tensionMin);
+                            const currentMaxIndex = tensionValues.indexOf(tensionMax);
+                            const isActive = i >= currentMinIndex && i <= currentMaxIndex;
+                            return (
+                                <div
+                                    key={i}
+                                    className={`slider-dot ${isActive ? 'active' : ''}`}
+                                    style={{ opacity: i < 1 || i > 5 ? 0 : 1 }}
+                                />
+                            );
+                        })}
                     </div>
                     <input
                         type="range"
@@ -88,8 +105,20 @@ const Controls: React.FC<ControlsProps> = ({
                 </div>
                 <div className="single-slider-container">
                     <div className="slider-track-visuals">
+                        {/* The filled line from start to current value */}
+                        <div
+                            className="slider-track-fill"
+                            style={{
+                                left: '14px',
+                                width: `calc((100% - 58px) * (${chestSize} / 5))`
+                            }}
+                        />
                         {sizes.map((_, i) => (
-                            <div key={i} className="slider-dot" style={{ opacity: i < 1  ? 0 : 1 }} />
+                            <div
+                                key={i}
+                                className={`slider-dot ${i <= chestSize ? 'active' : ''}`}
+                                style={{ opacity: i < 1 ? 0 : 1 }}
+                            />
                         ))}
                     </div>
                     <input

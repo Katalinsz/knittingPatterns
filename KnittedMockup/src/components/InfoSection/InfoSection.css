@@ -2,6 +2,7 @@
     padding: 4rem 3rem;
     width: 100%;
     background: white;
+    /* Consistently use white or a background variable if available */
 }
 
 .instructions-header {
@@ -10,35 +11,27 @@
 }
 
 .instructions-header h2 {
-    font-size: 4.2rem;
+    font-size: 5.6rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    color: #000;
-    line-height: 1.1;
+    color: var(--color-text);
+    line-height: 0.8;
     letter-spacing: normal;
 }
 
 .instructions-subtitle {
-    font-size: 1.7rem;
-    color: #000000;
-    margin: 0;
-    font-weight: 200;
+    font-size: 2.4rem;
+    color: var(--color-text);
+    font-weight: 325;
     letter-spacing: normal;
-    max-width: 700px;
-    line-height: 1.5;
+    
 }
 
 .instructions-container {
     display: flex;
     flex-direction: column;
     margin-bottom: 2rem;
-}
-
-.accordion-item {
-    margin-bottom: 0.75rem;
-    background: white;
-    border-radius: 8px;
-    overflow: visible;
+    margin-top: -2.8rem;
 }
 
 .accordion-item:last-child {
@@ -47,9 +40,10 @@
 
 .accordion-header {
     width: 100%;
-    padding: 1.25rem 1.5rem;
-    background: white;
-    border: 1px solid rgba(162, 162, 162, 0.233);
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    background: rgba(var(--color-secondary-rgb), 0.3);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.133);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -57,41 +51,42 @@
     cursor: pointer;
     text-align: left;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(var(--color-accent-rgb), 0.3);
+    /* Assuming rgb var exists, else fallback */
 }
 
 .accordion-header:hover {
-    border-color: rgba(128, 128, 128, 0.4);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border-color: rgba(var(--color-accent-rgb), 0.4);
+    box-shadow: 0 3px 10px rgba(var(--color-accent-rgb), 0.15);
 }
 
 .accordion-header span {
     font-size: 1.7rem;
-    font-weight: 400;
-    color: #444;
-    letter-spacing: normal;
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: normal; 
+    margin-bottom: 0.2rem;
 }
 
 .accordion-icon-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     transition: all 0.3s ease;
 }
 
 .accordion-icon {
-    width: 20px;
-    height: 20px;
-    stroke: #666;
+    width: 40px;
+    height: 40px;
+    stroke: var(--color-accent);
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .accordion-item.active .accordion-header {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+   
+    box-shadow: 0 2px 6px rgba(var(--color-accent-rgb), 0.12);
 }
 
 .accordion-item.active .accordion-icon {
@@ -102,24 +97,24 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    margin-bottom: 1rem;
 }
 
 .accordion-content.open {
     max-height: 1000px;
     padding: 2rem 1.5rem;
     background: white;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    border-top: none;
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(var(--color-accent-rgb), 0.333);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(var(--color-accent-rgb), 0.3);
 }
 
 .content-section-title {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 1.5rem 0;
-    color: #0066cc;
+    color: var(--color-primary);
+    /* Changed to primary from arbitrary blue */
     letter-spacing: 0.02em;
 }
 
@@ -145,7 +140,7 @@
     text-align: center;
     font-weight: 500;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--color-text);
     min-width: 120px;
 }
 
@@ -166,7 +161,7 @@
     font-size: 3.4rem;
     font-weight: 700;
     margin: 0 0 0.2rem 0;
-    color: #000;
+    color: var(--color-text);
     line-height: 1.1;
     letter-spacing: normal;
 }
@@ -193,7 +188,7 @@
     font-size: 1.1rem;
     line-height: 1.6;
     padding: 0.5rem 0;
-    color: #444;
+    color: var(--color-text);
     position: relative;
     padding-left: 1.5rem;
 }
@@ -202,7 +197,7 @@
     content: "→";
     position: absolute;
     left: 0;
-    color: #000;
+    color: var(--color-text);
     font-weight: bold;
 }
 
@@ -214,7 +209,7 @@
     font-size: 2rem;
     font-weight: 600;
     margin: 0 0 2rem 0;
-    color: #000;
+    color: var(--color-text);
     letter-spacing: 0.03em;
 }
 
@@ -242,7 +237,7 @@
 .total-rows {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #000;
+    color: var(--color-text);
     background: white;
     border-radius: 40px;
     padding: 0.5rem 1.5rem;
@@ -267,7 +262,7 @@
     border: none;
     font-size: 1.5rem;
     font-weight: 600;
-    color: #000;
+    color: var(--color-text);
     cursor: pointer;
     padding: 0;
     width: 30px;
@@ -298,13 +293,13 @@
 .row-label {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #000;
+    color: var(--color-text);
 }
 
 .row-number {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #000;
+    color: var(--color-text);
     background: white;
     padding: 0.5rem 1.25rem;
     border-radius: 40px;
