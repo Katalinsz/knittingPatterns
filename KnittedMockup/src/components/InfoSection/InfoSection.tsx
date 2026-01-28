@@ -4,8 +4,11 @@ import DownloadIcon from '../../assets/Logos/DownloadIcon.svg?react';
 import EditIcon from '../../assets/Logos/EditIcon.svg?react';
 import ArrowUpIcon from '../../assets/Logos/ArrowUpIcon.svg?react';
 import InfoIcon from '../../assets/Logos/InfoIcon.svg?react';
+import AccordionItem from './AccordionItem';
+import KnittingChart from './KnittingChart';
 
-// Data definition outside component to keep it clean
+// Data definition
+// In a real app, this might come from props or a context
 const ACCORDION_DATA = [
     {
         id: 0,
@@ -121,11 +124,17 @@ const ACCORDION_DATA = [
 
 const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>(({ showFloatingButtons }, ref) => {
     const [openAccordions, setOpenAccordions] = useState<Set<number>>(new Set());
-    const [currentRow, setCurrentRow] = useState(14);
-    const [totalRows] = useState(48);
 
     const toggleAccordion = (index: number) => {
         const newOpenAccordions = new Set<number>();
+        // Only allow one open at a time logic if desired, but code implies multiple can be open or single. 
+        // Original logic: if not has index, add it (clearing others). Wait, original logic:
+        // const newOpenAccordions = new Set<number>(); if (!has) add. set(new). 
+        // This effectively made it an accordion where only one or zero can be open? 
+        // Wait, "new Set<number>()" creates empty. So yes, replaces state.
+        // It toggles: if open, close it (empty set). If closed, open it (set with one ID).
+        // It seems it enforced single open item behavior inherently by creating a fresh set every time.
+
         if (!openAccordions.has(index)) {
             newOpenAccordions.add(index);
         }
@@ -137,37 +146,7 @@ const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>
         {
             id: 5,
             title: 'Chart',
-            content: (
-                <div className="knitting-chart-section" style={{ marginTop: 0 }}>
-                    <h3>Knitting chart line by line</h3>
-                    <div className="chart-container">
-                        <img src="/IconsImages/LineByLineChart.png" alt="Knitting Chart" className="chart-image" />
-                        <div className="chart-controls">
-                            <div className="total-rows">{totalRows}</div>
-                            <div className="row-navigator">
-                                <button
-                                    className="nav-button"
-                                    onClick={() => setCurrentRow(Math.max(1, currentRow - 1))}
-                                    disabled={currentRow <= 1}
-                                >
-                                    &lt;
-                                </button>
-                                <div className="current-row-display">
-                                    <span className="row-label">Current row:</span>
-                                    <span className="row-number">{currentRow}</span>
-                                </div>
-                                <button
-                                    className="nav-button"
-                                    onClick={() => setCurrentRow(Math.min(totalRows, currentRow + 1))}
-                                    disabled={currentRow >= totalRows}
-                                >
-                                    &gt;
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
+            content: <KnittingChart />
         }
     ];
 
@@ -180,7 +159,6 @@ const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>
         }
     };
 
-    // Check if all are currently open to set button text
     const isAllOpen = openAccordions.size === accordionData.length;
 
     return (
@@ -204,26 +182,15 @@ const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>
             </div>
 
             <div className="instructions-container">
-                {/* Accordion Sections */}
                 {accordionData.map((section) => (
-                    <div key={section.id} className={`accordion-item ${openAccordions.has(section.id) ? 'active' : ''}`}>
-                        <button
-                            className="accordion-header"
-                            onClick={() => toggleAccordion(section.id)}
-                        >
-                            <span>{section.title}</span>
-                            <div className="accordion-icon-wrapper">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="accordion-icon">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </div>
-                        </button>
-                        <div className={`accordion-content ${openAccordions.has(section.id) ? 'open' : ''}`}>
-                            <div className="accordion-content-inner">
-                                {section.content}
-                            </div>
-                        </div>
-                    </div>
+                    <AccordionItem
+                        key={section.id}
+                        id={section.id}
+                        title={section.title}
+                        content={section.content}
+                        isOpen={openAccordions.has(section.id)}
+                        onToggle={() => toggleAccordion(section.id)}
+                    />
                 ))}
             </div>
 
@@ -236,11 +203,15 @@ const InfoSection = forwardRef<HTMLDivElement, { showFloatingButtons: boolean }>
                         </div>
                         <p>Pro tip: The PDF is locked to the specific settings provided. Stick to the interactive guide above if you want instructions that adapt as you work.</p>
                     </div>
-                    <button className="action-button download-button">
+                    <button className="action-button download-button" aria-label="Download PDF">
                         <DownloadIcon />
                     </button>
                 </div>
-                <button className="action-button combined-button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <button
+                    className="action-button combined-button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    aria-label="Edit and Scroll to Top"
+                >
                     <EditIcon />
                     <div className="vertical-divider"></div>
                     <ArrowUpIcon />

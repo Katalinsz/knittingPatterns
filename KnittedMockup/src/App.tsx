@@ -24,30 +24,50 @@ function App() {
   const infoSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (infoSectionRef.current) {
-        const rect = infoSectionRef.current.getBoundingClientRect()
-        const isVisible = rect.top <= window.innerHeight / 2
-        setIsInInfoSection(isVisible)
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Logic: if intersecting (visible) OR if the top of the element is above the viewport (scrolled past),
+        // we consider the user "in" the section or past it?
+        // Original logic: rect.top <= window.innerHeight / 2.
+        // This means if the top of the section is in the top-half of the viewport or above it.
+
+        // IntersectionObserver alone tells if *any* part is visible.
+        // To match "scrolled past or into":
+        // We can observe a sentinel or the section itself with threshold.
+
+        // Let's stick to a simpler check inside the observer callback or use the entry data.
+        // If we want to replicate specifically "top <= window.innerHeight/2":
+        // We can check entry.boundingClientRect.top.
+
+        if (entry) {
+          setIsInInfoSection(entry.isIntersecting || entry.boundingClientRect.top < 0);
+        }
+      },
+      {
+        rootMargin: '-50% 0px 0px 0px' // This roughly emulates the "top <= innerHeight / 2" trigger point
       }
+    );
+
+    if (showInfoSection && infoSectionRef.current) {
+      observer.observe(infoSectionRef.current);
     }
 
-    if (showInfoSection) {
-      window.addEventListener('scroll', handleScroll)
-    }
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [showInfoSection])
+    return () => {
+      observer.disconnect();
+    };
+  }, [showInfoSection]); // Re-run if showInfoSection changes effectively enabling the check
 
   const scrollToInfo = () => {
     if (isInInfoSection) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setShowInfoSection(true)
+      setShowInfoSection(true);
+      // Small timeout to allow render before scroll
       setTimeout(() => {
-        infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
+        infoSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
     }
-  }
+  };
 
   return (
     <div className="app">
