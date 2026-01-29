@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Group, Path } from 'react-konva';
 import './ClothingPreview.css';
 import SweaterIcon from '../../assets/Logos/SweaterIcon.svg?react';
-import { useMotifLogic } from './useMotifLogic';
-import DraggableMotif from './DraggableMotif';
+import { useMotifLogic } from './hooks/useMotifLogic';
+import DraggableMotif from './Motif/DraggableMotif';
 
 const ClothingPreview = () => {
     const [isClothingDropdownOpen, setIsClothingDropdownOpen] = useState(false);

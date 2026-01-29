@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Motif } from './DraggableMotif';
+import type { Motif } from '../types';
 
 const STITCH_SIZE = 4; // Arbitrary connection to pixel size
 const STAGE_WIDTH = 400;
