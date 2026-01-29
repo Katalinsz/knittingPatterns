@@ -1,10 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Stage, Layer } from 'react-konva';
 import './ClothingPreview.css';
 import SweaterIcon from '../../assets/Logos/SweaterIcon.svg?react';
-import ImageIcon from '../../assets/Logos/ImageIcon.svg?react';
+import { useMotifLogic } from './useMotifLogic';
+import DraggableMotif from './DraggableMotif';
 
 const ClothingPreview = () => {
     const [isClothingDropdownOpen, setIsClothingDropdownOpen] = useState(false);
+
+    // Motif Logic
+    const {
+        placedMotifs,
+        selectedId,
+        selectMotif,
+        addMotif,
+        updateMotif,
+        designBounds,
+        stageDimensions
+    } = useMotifLogic();
+
+    // Auto-add a demo motif on mount for "Inspiration"
+    useEffect(() => {
+        // Use a sample image from the public folder or imports
+        // Using the BagIcon as a test or similar
+        // Ideally we should use a real motif image.
+        // The user mentioned "IconsImages/SweaterIcon.png" exists in the dropdown code.
+        addMotif('/IconsImages/SweaterIcon.png');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Deselect when clicking on empty stage area
+    const checkDeselect = (e: any) => {
+        // deselect when clicked on empty area
+        const clickedOnEmpty = e.target === e.target.getStage();
+        if (clickedOnEmpty) {
+            selectMotif(null);
+        }
+    };
 
     return (
         <>
@@ -71,7 +103,28 @@ const ClothingPreview = () => {
             <div className={`sweater-preview ${isClothingDropdownOpen ? 'dropdown-open' : ''}`}>
                 <div className="sweater-container">
                     <SweaterIcon className="sweater-base" />
-                    <ImageIcon className="motif-overlay" />
+
+                    {/* Konva Stage Layer for Motifs */}
+                    <Stage
+                        width={stageDimensions.width}
+                        height={stageDimensions.height}
+                        onMouseDown={checkDeselect}
+                        onTouchStart={checkDeselect}
+                        className="motif-stage"
+                    >
+                        <Layer>
+                            {placedMotifs.map((motif) => (
+                                <DraggableMotif
+                                    key={motif.id}
+                                    motif={motif}
+                                    isSelected={motif.id === selectedId}
+                                    onSelect={() => selectMotif(motif.id)}
+                                    onChange={updateMotif}
+                                    sweaterBounds={designBounds}
+                                />
+                            ))}
+                        </Layer>
+                    </Stage>
                 </div>
                 <div className="motif-size">
                     <label>Motif size</label>
