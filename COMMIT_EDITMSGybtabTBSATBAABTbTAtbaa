@@ -1,0 +1,17 @@
+
+Merge remote changes
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# interactive rebase in progress; onto 95d47b2
+# Last command done (1 command done):
+#    pick e0f5d6a Merge remote changes
+# Next commands to do (3 remaining commands):
+#    pick 112eb15 init commit
+#    pick 75f8219 fixed the nav-bar to be mobile friendly
+# You are currently rebasing branch 'main' on '95d47b2'.
+#
+# Changes to be committed:
+#	modified:   .gitignore
+#
