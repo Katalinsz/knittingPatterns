@@ -1,12 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Image as KonvaImage, Transformer, Group } from 'react-konva';
 import Konva from 'konva';
-import rotatingPointerCursor from '../../../assets/Logos/RotatingCursor.png?url';
 import { useMotifStyles } from '../hooks/useMotifStyles';
 import { MotifActions } from './MotifActions';
 import { useMotifDraggable } from '../hooks/useMotifDraggable';
 import { useMotifTransformer } from '../hooks/useMotifTransformer';
-
 import type { Motif } from '../types';
 
 
@@ -152,7 +150,7 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
                     anchorCornerRadius={50} // "make the anchor a circle"
                     anchorSize={15}
                     rotateAnchorAngle={-18}
-                    rotateAnchorCursor={`url(${rotatingPointerCursor}) 16 16, auto`}
+                    rotateAnchorCursor="crosshair"
                     rotateAnchorOffset={-10} /* Closer to the element */
                     boundBoxFunc={(oldBox, newBox) => {
                         return newBox;
