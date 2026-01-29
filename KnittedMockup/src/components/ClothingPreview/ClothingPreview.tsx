@@ -43,6 +43,22 @@ const ClothingPreview = () => {
         }
     };
 
+    // Deselect when clicking outside the canvas entirely
+    useEffect(() => {
+        const handleGlobalClick = (e: MouseEvent) => {
+            // Check if click is inside the Konva container (class 'konvajs-content')
+            const target = e.target as HTMLElement;
+            if (!target.closest('.konvajs-content')) {
+                selectMotif(null);
+            }
+        };
+
+        window.addEventListener('mousedown', handleGlobalClick);
+        return () => {
+            window.removeEventListener('mousedown', handleGlobalClick);
+        };
+    }, [selectMotif]);
+
     return (
         <>
             <div className="clothing-dropdown">
