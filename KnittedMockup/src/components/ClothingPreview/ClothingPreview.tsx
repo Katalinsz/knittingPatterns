@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Stage, Layer } from 'react-konva';
+import { useState, useEffect, useRef } from 'react';
+import { Stage, Layer, Group, Path } from 'react-konva';
 import './ClothingPreview.css';
 import SweaterIcon from '../../assets/Logos/SweaterIcon.svg?react';
 import { useMotifLogic } from './useMotifLogic';
@@ -8,6 +8,9 @@ import DraggableMotif from './DraggableMotif';
 const ClothingPreview = () => {
     const [isClothingDropdownOpen, setIsClothingDropdownOpen] = useState(false);
 
+    // Strict mode duplicate prevention
+    const initialized = useRef(false);
+
     // Motif Logic
     const {
         placedMotifs,
@@ -15,25 +18,27 @@ const ClothingPreview = () => {
         selectMotif,
         addMotif,
         updateMotif,
+        duplicateMotif,
+        deleteMotif,
         designBounds,
         stageDimensions
     } = useMotifLogic();
 
     // Auto-add a demo motif on mount for "Inspiration"
     useEffect(() => {
-        // Use a sample image from the public folder or imports
-        // Using the BagIcon as a test or similar
-        // Ideally we should use a real motif image.
-        // The user mentioned "IconsImages/SweaterIcon.png" exists in the dropdown code.
-        addMotif('/IconsImages/SweaterIcon.png');
+        if (!initialized.current) {
+            initialized.current = true;
+            // "use image icon instead of sweater icon"
+            addMotif('/IconsImages/ImageIcon.png');
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Deselect when clicking on empty stage area
     const checkDeselect = (e: any) => {
-        // deselect when clicked on empty area
-        const clickedOnEmpty = e.target === e.target.getStage();
-        if (clickedOnEmpty) {
+        // deselect when clicked on empty area (and not on a motif)
+        const clickedOnStage = e.target === e.target.getStage();
+        if (clickedOnStage) {
             selectMotif(null);
         }
     };
@@ -113,16 +118,34 @@ const ClothingPreview = () => {
                         className="motif-stage"
                     >
                         <Layer>
-                            {placedMotifs.map((motif) => (
-                                <DraggableMotif
-                                    key={motif.id}
-                                    motif={motif}
-                                    isSelected={motif.id === selectedId}
-                                    onSelect={() => selectMotif(motif.id)}
-                                    onChange={updateMotif}
-                                    sweaterBounds={designBounds}
+                            <Group>
+                                {/* Maps motifs */}
+                                <Group>
+                                    {placedMotifs.map((motif) => (
+                                        <DraggableMotif
+                                            key={motif.id}
+                                            motif={motif}
+                                            isSelected={motif.id === selectedId}
+                                            onSelect={() => selectMotif(motif.id)}
+                                            onChange={updateMotif}
+                                            onDuplicate={duplicateMotif}
+                                            onDelete={deleteMotif}
+                                            // Allow moving anywhere, visual clip handles the rest
+                                            sweaterBounds={{ ...designBounds, left: 0, top: 0, right: 400, bottom: 400 }}
+                                        />
+                                    ))}
+                                </Group>
+
+                                {/* Mask Layer using GCO. This shape keeps content overlapping it. */}
+                                <Path
+                                    data="M445.084,62.175L314.555,27.688C304.165,49.59,281.854,64.74,256,64.74 c-25.854,0-48.163-15.149-58.555-37.052L66.917,62.175L10.45,434.507l56.467,17.371l50.809-234.014v266.448h276.548V217.865 l50.809,234.014l56.467-17.371L445.084,62.175z"
+                                    fill="black" // needed for alpha mask
+                                    scaleX={400 / 512}
+                                    scaleY={400 / 512}
+                                    globalCompositeOperation="destination-in"
+                                    listening={false} // pass through events
                                 />
-                            ))}
+                            </Group>
                         </Layer>
                     </Stage>
                 </div>

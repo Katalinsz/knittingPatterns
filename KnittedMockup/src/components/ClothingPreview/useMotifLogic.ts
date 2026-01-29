@@ -5,6 +5,7 @@ const STITCH_SIZE = 4; // Arbitrary connection to pixel size
 const STAGE_WIDTH = 400;
 const STAGE_HEIGHT = 400;
 
+
 // Helper to calculate stitch count
 const calculateStitches = (width: number, height: number, stitchSize = STITCH_SIZE) => {
     const cols = Math.round(width / stitchSize);
@@ -110,6 +111,11 @@ export const useMotifLogic = () => {
         setSelectedId(newId);
     };
 
+    const deleteMotif = (id: string) => {
+        setPlacedMotifs((prev) => prev.filter((m) => m.id !== id));
+        if (selectedId === id) setSelectedId(null);
+    };
+
     return {
         placedMotifs,
         selectedId,
@@ -117,6 +123,7 @@ export const useMotifLogic = () => {
         addMotif,
         updateMotif,
         duplicateMotif,
+        deleteMotif,
         designBounds,
         stageDimensions: { width: STAGE_WIDTH, height: STAGE_HEIGHT }
     };
