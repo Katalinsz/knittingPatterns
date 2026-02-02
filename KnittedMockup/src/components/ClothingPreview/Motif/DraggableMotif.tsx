@@ -1,10 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Image as KonvaImage, Transformer, Group } from 'react-konva';
+import { Image as KonvaImage, Group } from 'react-konva';
 import Konva from 'konva';
-import { useMotifStyles } from '../hooks/useMotifStyles';
 import { MotifActions } from './MotifActions';
 import { useMotifDraggable } from '../hooks/useMotifDraggable';
-import { useMotifTransformer } from '../hooks/useMotifTransformer';
 import type { Motif } from '../types';
 
 
@@ -35,43 +33,18 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
     const groupRef = useRef<Konva.Group>(null);
     const imageRef = useRef<Konva.Image>(null);
     const actionsRef = useRef<Konva.Group>(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const transformerRef = useRef<any>(null);
 
     // Local State
     const [isHovered, setIsHovered] = useState(false);
 
     // Hooks
-    const styles = useMotifStyles();
     const { handleDragMove } = useMotifDraggable(groupRef, sweaterBounds);
-    useMotifTransformer(isSelected, groupRef, transformerRef);
 
     // Initial force update to ensure CSS variables are loaded
     const [, forceUpdate] = useState({});
     useEffect(() => {
         forceUpdate({});
     }, []);
-
-    // Handle IMPERATIVE counter-rotation for buttons during transform
-    useEffect(() => {
-        const node = groupRef.current;
-        if (!node) return;
-
-        const handleTransform = () => {
-            if (actionsRef.current) {
-                // Counter-rotate the buttons group so it stays upright
-                actionsRef.current.rotation(-node.rotation());
-            }
-        };
-
-        node.on('transform', handleTransform);
-        // Initial sync
-        handleTransform();
-
-        return () => {
-            node.off('transform', handleTransform);
-        };
-    }, []); // Run once on mount
 
     // Change Handlers
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
@@ -80,18 +53,7 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
             ...motif,
             x: node.x(),
             y: node.y(),
-            rotation: node.rotation(),
-            scaleX: node.scaleX(),
-            scaleY: node.scaleY(),
-        });
-    };
-
-    const handleTransformEnd = (e: Konva.KonvaEventObject<Event>) => {
-        const node = e.target;
-        onChange({
-            ...motif,
-            x: node.x(),
-            y: node.y(),
+            // Ensure rotation is passed as what it is (likely 0 now) or reset if we want to enforce 0
             rotation: node.rotation(),
             scaleX: node.scaleX(),
             scaleY: node.scaleY(),
@@ -112,7 +74,6 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
                 onTap={onSelect}
                 onDragMove={handleDragMove}
                 onDragEnd={handleDragEnd}
-                onTransformEnd={handleTransformEnd}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -132,31 +93,8 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
                     isHovered={isHovered}
                     onDuplicate={onDuplicate}
                     onDelete={onDelete}
-                    parentRotation={motif.rotation || 0}
                 />
             </Group>
-
-            {isSelected && (
-                <Transformer
-                    ref={transformerRef}
-                    enabledAnchors={[]} /* Disable resizing */
-                    rotationSnaps={[0, 90, 180, 270]}
-                    // Hide default border so we can use our custom rounded one
-                    borderEnabled={false}
-                    // Styling Anchors
-                    anchorFill={styles.buttonFill}
-                    anchorStroke={styles.accentColor}
-                    anchorStrokeWidth={2}
-                    anchorCornerRadius={50} // "make the anchor a circle"
-                    anchorSize={15}
-                    rotateAnchorAngle={-18}
-                    rotateAnchorCursor="crosshair"
-                    rotateAnchorOffset={-10} /* Closer to the element */
-                    boundBoxFunc={(oldBox, newBox) => {
-                        return newBox;
-                    }}
-                />
-            )}
         </React.Fragment>
     );
 };
