@@ -33,6 +33,7 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
     const groupRef = useRef<Konva.Group>(null);
     const imageRef = useRef<Konva.Image>(null);
     const actionsRef = useRef<Konva.Group>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
     // Local State
     const [isHovered, setIsHovered] = useState(false);
@@ -46,6 +47,27 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
         forceUpdate({});
     }, []);
 
+    // Handle IMPERATIVE counter-rotation for buttons during transform
+    useEffect(() => {
+        const node = groupRef.current;
+        if (!node) return;
+
+        const handleTransform = () => {
+            if (actionsRef.current) {
+                // Counter-rotate the buttons group so it stays upright
+                actionsRef.current.rotation(-node.rotation());
+            }
+        };
+
+        node.on('transform', handleTransform);
+        // Initial sync
+        handleTransform();
+
+        return () => {
+            node.off('transform', handleTransform);
+        };
+    }, []); // Run once on mount
+
     // Change Handlers
     const handleDragEnd = (e: Konva.KonvaEventObject<DragEvent>) => {
         const node = e.target;
@@ -53,7 +75,18 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
             ...motif,
             x: node.x(),
             y: node.y(),
-            // Ensure rotation is passed as what it is (likely 0 now) or reset if we want to enforce 0
+            rotation: node.rotation(),
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+        });
+    };
+
+    const handleTransformEnd = (e: Konva.KonvaEventObject<Event>) => {
+        const node = e.target;
+        onChange({
+            ...motif,
+            x: node.x(),
+            y: node.y(),
             rotation: node.rotation(),
             scaleX: node.scaleX(),
             scaleY: node.scaleY(),
@@ -74,6 +107,7 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
                 onTap={onSelect}
                 onDragMove={handleDragMove}
                 onDragEnd={handleDragEnd}
+                onTransformEnd={handleTransformEnd}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
@@ -93,8 +127,11 @@ const DraggableMotif: React.FC<DraggableMotifProps> = ({
                     isHovered={isHovered}
                     onDuplicate={onDuplicate}
                     onDelete={onDelete}
+                    parentRotation={motif.rotation || 0}
                 />
             </Group>
+
+            
         </React.Fragment>
     );
 };
