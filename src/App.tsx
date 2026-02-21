@@ -11,87 +11,53 @@ import Controls from './components/Controls/Controls';
 import InfoSection from './components/InfoSection/InfoSection';
 import InfoModal from './components/Modal/InfoModal';
 import DocumentIcon from './assets/Logos/DocumentIcon.svg?react';
-import { patternAPI } from './utils/api';
-import type { Pattern } from './types/pattern';
+import { useMotifData } from './hooks/useMotifData';
+import { usePatternCalculation } from './hooks/usePatternCalculation';
+import { SWEATER_SIZES } from './constants/patternSizes';
 
 function App() {
   const [knittingTensionMin, setKnittingTensionMin] = useState(18)
   const [knittingTensionMax, setKnittingTensionMax] = useState(32)
   const [chestSize, setChestSize] = useState(2) // 0-5 for sweater sizes
-  const [sizeMin, setSizeMin] = useState(60) // Baby blanket width
+  const [sizeMin, setSizeMin] = useState(60) // Baby blanket width (or hat circumference)
   const [sizeMax, setSizeMax] = useState(80) // Baby blanket height
   const [activeModal, setActiveModal] = useState<'tension' | 'chest' | 'motifError' | null>(null)
   const [motifErrorMessage, setMotifErrorMessage] = useState<string>('')
-  const [pattern, setPattern] = useState<Pattern | null>(null)
   const [loading, setLoading] = useState(true)
-  const [currentPattern, setCurrentPattern] = useState<string>('BabyBlanket')
-  const [accordionSections, setAccordionSections] = useState<any[]>([])
-  const [blanketDimensions, setBlanketDimensions] = useState({ width: 60, height: 80 })
-  const [motifSize, setMotifSize] = useState<{ stitches: number; rows: number; widthCm: number; heightCm: number } | null>(null)
-  const [motifImageUrl, setMotifImageUrl] = useState<string | null>(null)
-  const [motifDimensions, setMotifDimensions] = useState<{ width: number; height: number } | null>(null)
-  const [motifId, setMotifId] = useState<string | null>(null)
   const [motifPositions, setMotifPositions] = useState<{ id: string; bottomRightXCm: number; bottomRightYCm: number }[]>([])
-  
+
   // Track previous valid values for reverting on error
   const previousValues = useRef({ tensionMin: 18, tensionMax: 32, sizeMin: 60, sizeMax: 80 })
 
   // Fixed tension range for all patterns
   const tensionRange = { min: 8, max: 40 };
 
-  // Chest/bust size → body dimensions (half-chest width used for knitting calculations).
-  // Index matches the chestSize slider value (0 = XS … 5 = XXL).
-  const SWEATER_SIZES = [
-    { label: 'XS', bodyWidth: 48, bodyLength: 64 },
-    { label: 'S',  bodyWidth: 52, bodyLength: 67 },
-    { label: 'M',  bodyWidth: 56, bodyLength: 70 },
-    { label: 'L',  bodyWidth: 62, bodyLength: 73 },
-    { label: 'XL', bodyWidth: 68, bodyLength: 76 },
-    { label: 'XXL',bodyWidth: 74, bodyLength: 79 },
-  ];
+  // --- Hooks ---
+  const { currentPattern, motifId, motifImageUrl, motifDimensions } = useMotifData()
 
-  // Read pattern and motifId from URL, fetch motif data from external API
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const patternParam = params.get('pattern') || 'BabyBlanket';
-    setCurrentPattern(patternParam);
-    
-    // Fetch motif data from external API using motifId
-    const motifIdParam = params.get('motifId');
-    if (motifIdParam) setMotifId(motifIdParam);
-    
-    if (motifIdParam) {
-      const motifId = motifIdParam;
-      const fetchMotifData = async () => {
-        try {
-          // Fetch motif JSON for width and height
-          const response = await fetch(`https://assets.knittedforyou.com/motif/${motifId}.json`);
-          if (response.ok) {
-            const data = await response.json();
-            
-            // Set motif dimensions from fetched data
-            if (data.width && data.height) {
-              setMotifDimensions({
-                width: data.width,
-                height: data.height
-              });
-            }
-            
-            // Construct image URL
-            setMotifImageUrl(`https://assets.knittedforyou.com/motif/${motifId}.png`);
-          } else {
-            console.warn(`Failed to fetch motif data for ID: ${motifId}`);
-          }
-        } catch (error) {
-          console.error('Error fetching motif data:', error);
-        }
-      };
-      
-      fetchMotifData();
-    }
-  }, []);
+  const { accordionSections, motifSize, blanketDimensions, calculate } = usePatternCalculation({
+    currentPattern,
+    loading,
+    knittingTensionMin,
+    knittingTensionMax,
+    sizeMin,
+    sizeMax,
+    chestSize,
+    motifDimensions,
+    motifPositions,
+    onError: (message) => {
+      setMotifErrorMessage(message)
+      setActiveModal('motifError')
+    },
+    onRevert: () => {
+      setKnittingTensionMin(previousValues.current.tensionMin)
+      setKnittingTensionMax(previousValues.current.tensionMax)
+      setSizeMin(previousValues.current.sizeMin)
+      setSizeMax(previousValues.current.sizeMax)
+    },
+  })
 
-  // Fetch pattern data based on current pattern type
+  // Load .pat file and run initial calculation whenever the pattern type changes
   useEffect(() => {
     const loadPattern = async () => {
       try {
@@ -99,197 +65,22 @@ function App() {
         // Reset size slider to a sensible default when switching patterns
         if (currentPattern === 'Hat') setSizeMin(56);
         else if (currentPattern === 'BabyBlanket') setSizeMin(60);
-        // Load pattern based on URL parameter
-        const patternFile = currentPattern === 'BabyBlanket' ? 'babyblanket1.pat' : 'sweater1.pat';
-        const data = await patternAPI.getPattern(patternFile);
-        setPattern(data);
-        
-        // Calculate pattern with current slider values
-        if (currentPattern === 'BabyBlanket') {
-          await calculateBabyBlanketPattern();
-        } else if (currentPattern === 'Hat') {
-          await calculateHatPatternFn();
-        } else {
-          await calculateSweaterPatternFn();
-        }
+
+        // Trigger initial calculation for the new pattern type
+        const type = currentPattern === 'BabyBlanket' ? 'blanket'
+          : currentPattern === 'Hat' ? 'hat'
+          : 'sweater';
+        await calculate(type);
       } catch (error) {
         console.error('Failed to load pattern:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadPattern();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPattern]);
-
-  // Calculate pattern whenever sliders change or motif dimensions load (for baby blanket)
-  useEffect(() => {
-    if (currentPattern === 'BabyBlanket' && !loading) {
-      const debounce = setTimeout(() => {
-        calculateBabyBlanketPattern();
-      }, 500); // Debounce to avoid too many API calls
-      
-      return () => clearTimeout(debounce);
-    }
-  }, [knittingTensionMin, knittingTensionMax, sizeMin, sizeMax, currentPattern, loading, motifDimensions]);
-
-  // Recalculate sweater whenever tension or chest size changes
-  useEffect(() => {
-    if (currentPattern !== 'BabyBlanket' && currentPattern !== 'Hat' && !loading) {
-      const debounce = setTimeout(() => {
-        calculateSweaterPatternFn();
-      }, 500);
-      return () => clearTimeout(debounce);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [knittingTensionMin, knittingTensionMax, chestSize, currentPattern, loading, motifDimensions]);
-
-  // Recalculate hat whenever tension or hat circumference slider changes
-  useEffect(() => {
-    if (currentPattern === 'Hat' && !loading) {
-      const debounce = setTimeout(() => {
-        calculateHatPatternFn();
-      }, 500);
-      return () => clearTimeout(debounce);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [knittingTensionMin, knittingTensionMax, sizeMin, currentPattern, loading, motifDimensions]);
-
-  const calculateHatPatternFn = async () => {
-    try {
-      const circumference = sizeMin;
-      const hatHeight = Math.round(circumference / 2 - 4);
-      const result = await patternAPI.calculatePattern({
-        patternFile: 'hat1.pat',
-        tensionX: knittingTensionMin,
-        tensionY: knittingTensionMax,
-        width:  circumference,
-        height: hatHeight,
-        ...(motifDimensions && {
-          motifWidth:  motifDimensions.width,
-          motifHeight: motifDimensions.height,
-        }),
-        motifPositions,
-      });
-
-      if (result.success) {
-        setAccordionSections(result.sections);
-        if (result.calculated?.motifWidthStitches && result.calculated?.motifHeightRows) {
-          setMotifSize({
-            stitches:  result.calculated.motifWidthStitches,
-            rows:      result.calculated.motifHeightRows,
-            widthCm:   result.calculated.motifWidthCm  || 0,
-            heightCm:  result.calculated.motifHeightCm || 0,
-          });
-        } else {
-          setMotifSize(null);
-        }
-      } else if (result.errors?.length > 0) {
-        setMotifErrorMessage(result.errors.join(' '));
-        setActiveModal('motifError');
-      }
-    } catch (error) {
-      console.error('Failed to calculate hat pattern:', error);
-    }
-  };
-
-  const calculateSweaterPatternFn = async () => {
-    try {
-      const size = SWEATER_SIZES[chestSize] ?? SWEATER_SIZES[2];
-      const result = await patternAPI.calculatePattern({
-        patternFile: 'sweater1.pat',
-        tensionX: knittingTensionMin,
-        tensionY: knittingTensionMax,
-        width:  size.bodyWidth,
-        height: size.bodyLength,
-        ...(motifDimensions && {
-          motifWidth:  motifDimensions.width,
-          motifHeight: motifDimensions.height,
-        }),
-        motifPositions,
-      });
-
-      if (result.success) {
-        setAccordionSections(result.sections);
-        if (result.calculated?.motifWidthStitches && result.calculated?.motifHeightRows) {
-          setMotifSize({
-            stitches:  result.calculated.motifWidthStitches,
-            rows:      result.calculated.motifHeightRows,
-            widthCm:   result.calculated.motifWidthCm  || 0,
-            heightCm:  result.calculated.motifHeightCm || 0,
-          });
-        } else {
-          setMotifSize(null);
-        }
-      } else if (result.errors?.length > 0) {
-        setMotifErrorMessage(result.errors.join(' '));
-        setActiveModal('motifError');
-      }
-    } catch (error) {
-      console.error('Failed to calculate sweater pattern:', error);
-    }
-  };
-
-  const calculateBabyBlanketPattern = async () => {
-    try {
-      const result = await patternAPI.calculatePattern({
-        patternFile: 'babyblanket1.pat',
-        tensionX: knittingTensionMin,
-        tensionY: knittingTensionMax,
-        width: sizeMin,
-        height: sizeMax,
-        ...(motifDimensions && {
-          motifWidth: motifDimensions.width,
-          motifHeight: motifDimensions.height
-        }),
-        motifPositions,
-      });
-      
-      if (result.success) {
-        setAccordionSections(result.sections);
-        // Update blanket dimensions from backend calculations
-        setBlanketDimensions({
-          width: result.defaults['width-cm'] || sizeMin,
-          height: result.defaults['height-cm'] || sizeMax
-        });
-        // Update motif size from backend calculations (only if motif data exists)
-        if (result.calculated && result.calculated.motifWidthStitches && result.calculated.motifHeightRows) {
-          setMotifSize({
-            stitches: result.calculated.motifWidthStitches,
-            rows: result.calculated.motifHeightRows,
-            widthCm: result.calculated.motifWidthCm || 0,
-            heightCm: result.calculated.motifHeightCm || 0
-          });
-        } else {
-          setMotifSize(null);
-        }
-      } else if (result.errors && result.errors.length > 0) {
-        // Motif size error - revert to previous values
-        setKnittingTensionMin(previousValues.current.tensionMin);
-        setKnittingTensionMax(previousValues.current.tensionMax);
-        setSizeMin(previousValues.current.sizeMin);
-        setSizeMax(previousValues.current.sizeMax);
-        
-        // Show error modal
-        setMotifErrorMessage(result.errors.join(' '));
-        setActiveModal('motifError');
-      }
-    } catch (error: unknown) {
-      console.error('Failed to calculate pattern:', error);
-      
-      // Check if this is a motif size error (400 Bad Request)
-      if (error instanceof Error && error.message && error.message.includes('Bad Request')) {
-        // Revert to previous values
-        setKnittingTensionMin(previousValues.current.tensionMin);
-        setKnittingTensionMax(previousValues.current.tensionMax);
-        setSizeMin(previousValues.current.sizeMin);
-        setSizeMax(previousValues.current.sizeMax);
-        
-        setMotifErrorMessage('The motif is too large for the current pattern dimensions. Please adjust the size or tension.');
-        setActiveModal('motifError');
-      }
-    }
-  };
 
   // Info Section Scroll Logic
   const [showInfoSection, setShowInfoSection] = useState(false)
