@@ -3,6 +3,7 @@ import './ClothingPreview.css';
 import { ClothingDropdown, PatternCanvas } from './components';
 import { useMotifLogic } from './hooks/useMotifLogic';
 import { usePatternConfig } from './hooks/usePatternConfig';
+import { useMotifPositions } from './hooks/useMotifPositions';
 import { DimensionCalculator } from './services';
 import { Bounds } from './models/Bounds';
 import BabyBlanketImage from '../../assets/Patterns/BabybBlanketPatternImage.png';
@@ -211,18 +212,13 @@ const ClothingPreview: React.FC<ClothingPreviewProps> = ({
         onMotifsUpdatedSuccessfully
     });
 
-    // Emit motif positions in cm whenever motifs change
-    useEffect(() => {
-        if (!onMotifPositionsChange || !garmentDimsCm || !designBounds || designBounds.width === 0 || designBounds.height === 0) return;
-        const positions = placedMotifs.map(m => ({
-            id: m.id,
-            bottomRightXCm: Math.round(((m.x + m.width  - designBounds.left) / designBounds.width)  * garmentDimsCm.width  * 10) / 10,
-            bottomRightYCm: Math.round(((m.y + m.height - designBounds.top)  / designBounds.height) * garmentDimsCm.height * 10) / 10,
-        }));
-        console.log('[ClothingPreview] motif positions in cm:', positions);
-        onMotifPositionsChange(positions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [placedMotifs, designBounds, garmentDimsCm]);
+    // Track motif positions in cm and forward them to the parent
+    useMotifPositions({
+        motifs: placedMotifs,
+        designBounds,
+        garmentDimsCm,
+        onChange: onMotifPositionsChange,
+    });
 
     // Baby blanket image state
     const [blanketImage, setBlanketImage] = useState<HTMLImageElement | null>(null);
