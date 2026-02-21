@@ -6,7 +6,7 @@
     "height-cm": 90,
     "cast-on": 152,
     "ribbing-height-cm": 3,
-    "ribbing-width-stitches": 8,
+    "ribbing-width-stitches": 8
   },
   "dependencies": {
     "motif-width-stitches": 27,

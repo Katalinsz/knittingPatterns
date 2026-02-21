@@ -325,6 +325,10 @@ function removeMotifLines(content) {
  * 3) Final solved process — dispatches to the correct calculator by pat.type
  */
 function solvePattern(pat) {
+    // Merge dependencies into defaults so calculators can read them from d[]
+    if (pat.dependencies) {
+        pat.defaults = { ...pat.dependencies, ...pat.defaults };
+    }
     const type = pat.type || 'blanket';
     console.log('[solvePattern] dispatching to type:', type);
     let result;
