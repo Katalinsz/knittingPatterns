@@ -16,6 +16,7 @@ interface ControlsProps {
     tensionRange?: { min: number; max: number };
     sizeRange?: { min: number; max: number; step?: number };
     isBabyBlanket?: boolean;
+    isHat?: boolean;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -32,11 +33,12 @@ const Controls: React.FC<ControlsProps> = ({
     onOpenInfo,
     tensionRange = { min: 17, max: 23 },
     sizeRange = { min: 0, max: 5, step: 1 },
-    isBabyBlanket = false
+    isBabyBlanket = false,
+    isHat = false
 }) => {
     const sizes = ['Woman XXS', 'Woman XS', 'Woman S', 'Woman M', 'Woman L', 'Woman XL'];
-    const sizeLabel = isBabyBlanket ? 'Size' : 'Chest / Bust';
-    const sizeValue = isBabyBlanket ? `${sizeMin} × ${sizeMax}` : sizes[chestSize];
+    const sizeLabel = isBabyBlanket ? 'Size' : isHat ? 'Head Circumference' : 'Chest / Bust';
+    const sizeValue = isBabyBlanket ? `${sizeMin} × ${sizeMax}` : isHat ? `${sizeMin} cm` : sizes[chestSize];
     const sizeStep = sizeRange.step || 1;
 
     return (
@@ -158,6 +160,27 @@ const Controls: React.FC<ControlsProps> = ({
                                 }
                             }}
                             className="slider slider-max"
+                        />
+                    </div>
+                ) : isHat ? (
+                    <div className="single-slider-container">
+                        <div className="slider-track-visuals">
+                            <div
+                                className="slider-track-fill"
+                                style={{
+                                    left: '14px',
+                                    width: `calc((100% - 58px) * ((${sizeMin} - ${sizeRange.min}) / ${sizeRange.max - sizeRange.min}))`
+                                }}
+                            />
+                        </div>
+                        <input
+                            type="range"
+                            min={sizeRange.min}
+                            max={sizeRange.max}
+                            step={sizeStep}
+                            value={sizeMin}
+                            onChange={(e) => setSizeMin(parseInt(e.target.value))}
+                            className="slider"
                         />
                     </div>
                 ) : (

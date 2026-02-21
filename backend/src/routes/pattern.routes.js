@@ -25,8 +25,11 @@ const router = express.Router();
 router.post("/calculate", async (req, res) => {
     try {
         console.log('[pattern/calculate] raw body:', JSON.stringify(req.body));
-        const { patternFile, tensionX, tensionY, width, height, motifWidth, motifHeight } = req.body;
+        const { patternFile, tensionX, tensionY, width, height, motifWidth, motifHeight, motifPositions } = req.body;
         console.log('[pattern/calculate] destructured:', { patternFile, tensionX, tensionY, width, height, motifWidth, motifHeight });
+        if (motifPositions?.length) {
+            console.log('[pattern/calculate] motifPositions:', JSON.stringify(motifPositions));
+        }
 
         // Validate inputs - check for undefined/null, allow 0
         if (!patternFile || tensionX == null || tensionY == null || width == null || height == null) {
@@ -90,7 +93,8 @@ router.post("/calculate", async (req, res) => {
             warnings: result.warnings,
             sections: sections,
             calculated: result.pat.calculated,
-            defaults: result.pat.defaults
+            defaults: result.pat.defaults,
+            motifPositions: motifPositions ?? []
         });
 
     } catch (error) {

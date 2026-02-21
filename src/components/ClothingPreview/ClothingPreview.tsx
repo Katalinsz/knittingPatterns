@@ -17,8 +17,14 @@ interface ClothingPreviewProps {
      *  when motifSize is null (e.g. sweater, where no backend tension calculation runs). */
     motifDimensions?: { width: number; height: number } | null;
     motifImageUrl?: string | null;
+    /** Hat head circumference + height in cm — drives the hat image size. */
+    hatDimensions?: { circumference: number; height: number } | null;
+    /** Actual garment cm dimensions that designBounds maps to (used for motif position conversion). */
+    garmentDimsCm?: { width: number; height: number } | null;
     onMotifsCannotFit?: () => void;
     onMotifsUpdatedSuccessfully?: () => void;
+    /** Called whenever placed motifs change, with each motif's bottom-right corner in cm. */
+    onMotifPositionsChange?: (positions: { id: string; bottomRightXCm: number; bottomRightYCm: number }[]) => void;
 }
 
 interface MotifDisplayDimensions {
@@ -37,8 +43,11 @@ const ClothingPreview: React.FC<ClothingPreviewProps> = ({
     motifSize = null,
     motifDimensions = null,
     motifImageUrl = null,
+    hatDimensions = null,
+    garmentDimsCm = null,
     onMotifsCannotFit,
-    onMotifsUpdatedSuccessfully
+    onMotifsUpdatedSuccessfully,
+    onMotifPositionsChange,
 }) => {
     // Pattern configuration from URL
     const patternConfig = usePatternConfig(blanketDimensions);
@@ -68,10 +77,21 @@ const ClothingPreview: React.FC<ClothingPreviewProps> = ({
         return dimensionCalculator.calculate(SWEATER_CANVAS_DIMS);
     }, [patternConfig.isBabyBlanket, patternConfig.isHat, dimensionCalculator, SWEATER_CANVAS_DIMS]);
 
-    // Hat-specific canvas dimensions.
-    // The PNG is 135×119 px (nearly square); smaller virtual dims = bigger rendered image.
-    // Tune width/height to change the rendered size on the canvas.
-    const HAT_CANVAS_DIMS = useMemo(() => ({ width: 85, height: 75 }), []);
+    // Hat-specific canvas dimensions — scales with the selected head circumference.
+    // Uses range-based scaling: at min (10 cm) the hat renders at 45% of base size,
+    // growing linearly to 120% at max (60 cm), so even the smallest value is visible.
+    const HAT_CANVAS_DIMS = useMemo(() => {
+        const baseW = 85;
+        const baseH = 75;
+        if (!hatDimensions) return { width: baseW, height: baseH };
+        const HAT_MIN = 10, HAT_MAX = 60;
+        const t = Math.min(1, Math.max(0, (hatDimensions.circumference - HAT_MIN) / (HAT_MAX - HAT_MIN)));
+        const scale = 0.45 + 0.75 * t; // 0.45 at 10 cm → 1.20 at 60 cm
+        return {
+            width:  Math.round(baseW * scale),
+            height: Math.round(baseH * scale),
+        };
+    }, [hatDimensions]);
 
     // Calculate display dimensions for hat
     const hatCalc = useMemo(() => {
@@ -190,6 +210,19 @@ const ClothingPreview: React.FC<ClothingPreviewProps> = ({
         },
         onMotifsUpdatedSuccessfully
     });
+
+    // Emit motif positions in cm whenever motifs change
+    useEffect(() => {
+        if (!onMotifPositionsChange || !garmentDimsCm || !designBounds || designBounds.width === 0 || designBounds.height === 0) return;
+        const positions = placedMotifs.map(m => ({
+            id: m.id,
+            bottomRightXCm: Math.round(((m.x + m.width  - designBounds.left) / designBounds.width)  * garmentDimsCm.width  * 10) / 10,
+            bottomRightYCm: Math.round(((m.y + m.height - designBounds.top)  / designBounds.height) * garmentDimsCm.height * 10) / 10,
+        }));
+        console.log('[ClothingPreview] motif positions in cm:', positions);
+        onMotifPositionsChange(positions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [placedMotifs, designBounds, garmentDimsCm]);
 
     // Baby blanket image state
     const [blanketImage, setBlanketImage] = useState<HTMLImageElement | null>(null);

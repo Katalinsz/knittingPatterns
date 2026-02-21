@@ -31,22 +31,13 @@ function App() {
   const [motifImageUrl, setMotifImageUrl] = useState<string | null>(null)
   const [motifDimensions, setMotifDimensions] = useState<{ width: number; height: number } | null>(null)
   const [motifId, setMotifId] = useState<string | null>(null)
+  const [motifPositions, setMotifPositions] = useState<{ id: string; bottomRightXCm: number; bottomRightYCm: number }[]>([])
   
   // Track previous valid values for reverting on error
   const previousValues = useRef({ tensionMin: 18, tensionMax: 32, sizeMin: 60, sizeMax: 80 })
 
   // Fixed tension range for all patterns
   const tensionRange = { min: 8, max: 40 };
-
-  // Head circumference sizes for hat slider (0 = XS … 5 = XL).
-  const HAT_CIRCUMFERENCES = [
-    { label: 'XS (52 cm)', circumference: 52, height: 22 },
-    { label: 'S  (54 cm)', circumference: 54, height: 23 },
-    { label: 'M  (56 cm)', circumference: 56, height: 24 },
-    { label: 'L  (58 cm)', circumference: 58, height: 25 },
-    { label: 'XL (60 cm)', circumference: 60, height: 26 },
-    { label: 'XXL(62 cm)', circumference: 62, height: 27 },
-  ];
 
   // Chest/bust size → body dimensions (half-chest width used for knitting calculations).
   // Index matches the chestSize slider value (0 = XS … 5 = XXL).
@@ -105,6 +96,9 @@ function App() {
     const loadPattern = async () => {
       try {
         setLoading(true);
+        // Reset size slider to a sensible default when switching patterns
+        if (currentPattern === 'Hat') setSizeMin(56);
+        else if (currentPattern === 'BabyBlanket') setSizeMin(60);
         // Load pattern based on URL parameter
         const patternFile = currentPattern === 'BabyBlanket' ? 'babyblanket1.pat' : 'sweater1.pat';
         const data = await patternAPI.getPattern(patternFile);
@@ -150,7 +144,7 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [knittingTensionMin, knittingTensionMax, chestSize, currentPattern, loading, motifDimensions]);
 
-  // Recalculate hat whenever tension or chest size slider (repurposed as hat size) changes
+  // Recalculate hat whenever tension or hat circumference slider changes
   useEffect(() => {
     if (currentPattern === 'Hat' && !loading) {
       const debounce = setTimeout(() => {
@@ -159,21 +153,23 @@ function App() {
       return () => clearTimeout(debounce);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [knittingTensionMin, knittingTensionMax, chestSize, currentPattern, loading, motifDimensions]);
+  }, [knittingTensionMin, knittingTensionMax, sizeMin, currentPattern, loading, motifDimensions]);
 
   const calculateHatPatternFn = async () => {
     try {
-      const size = HAT_CIRCUMFERENCES[chestSize] ?? HAT_CIRCUMFERENCES[2];
+      const circumference = sizeMin;
+      const hatHeight = Math.round(circumference / 2 - 4);
       const result = await patternAPI.calculatePattern({
         patternFile: 'hat1.pat',
         tensionX: knittingTensionMin,
         tensionY: knittingTensionMax,
-        width:  size.circumference,
-        height: size.height,
+        width:  circumference,
+        height: hatHeight,
         ...(motifDimensions && {
           motifWidth:  motifDimensions.width,
           motifHeight: motifDimensions.height,
         }),
+        motifPositions,
       });
 
       if (result.success) {
@@ -210,6 +206,7 @@ function App() {
           motifWidth:  motifDimensions.width,
           motifHeight: motifDimensions.height,
         }),
+        motifPositions,
       });
 
       if (result.success) {
@@ -244,7 +241,8 @@ function App() {
         ...(motifDimensions && {
           motifWidth: motifDimensions.width,
           motifHeight: motifDimensions.height
-        })
+        }),
+        motifPositions,
       });
       
       if (result.success) {
@@ -356,8 +354,11 @@ function App() {
   }
 
   const isBabyBlanket = currentPattern === 'BabyBlanket';
+  const isHat = currentPattern === 'Hat';
   const sizeRange = isBabyBlanket 
     ? { min: 60, max: 140, step: 10 }
+    : isHat
+    ? { min: 10, max: 60, step: 5 }
     : { min: 0, max: 5, step: 1 };
 
   return (
@@ -371,6 +372,13 @@ function App() {
             motifSize={motifSize}
             motifDimensions={motifDimensions}
             motifImageUrl={motifImageUrl}
+            hatDimensions={isHat ? { circumference: sizeMin, height: Math.round(sizeMin / 2 - 4) } : null}
+            garmentDimsCm={
+              isBabyBlanket ? blanketDimensions
+              : isHat ? { width: sizeMin, height: Math.round(sizeMin / 2 - 4) }
+              : { width: SWEATER_SIZES[chestSize]?.bodyWidth ?? 56, height: SWEATER_SIZES[chestSize]?.bodyLength ?? 70 }
+            }
+            onMotifPositionsChange={setMotifPositions}
             onMotifsCannotFit={() => {
               // Revert to previous valid values
               setKnittingTensionMin(previousValues.current.tensionMin);
@@ -406,6 +414,7 @@ function App() {
             tensionRange={tensionRange}
             sizeRange={sizeRange}
             isBabyBlanket={isBabyBlanket}
+            isHat={isHat}
           />
         </div>
       </main>
